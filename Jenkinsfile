@@ -90,16 +90,49 @@ pipeline {
             }
             steps {
                 sh '''
-                    npm install netlify-cli@20.1.1
+                    npm install netlify-cli@20.1.1 node-jq
+                    # install netlify and node-jq to get output of 
+                    # node_modules/.bin/netlify deploy --dir=build in json format
                     node_modules/.bin/netlify --version
                     echo "Deploying to staging. Site ID: $NETLIFY_SITE_ID"
                     node_modules/.bin/netlify status
-                    node_modules/.bin/netlify deploy --dir=build
+                    node_modules/.bin/netlify deploy --dir=build --json > deploy-output.json
+                    # output of node_modules/.bin/netlify deploy --dir=build to json format and store in file.
                 '''
+                script {
+                    env.STAGING_URL = sh(script: "node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json", returnStdout: true)
+                }
             }
         }
 
-        stage('Approval') {
+        stage('Staging E2E Test') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    reuseNode true
+                }
+            }
+
+            environment {
+                CI_ENVIRONMENT_URL = "${env.STAGING_URL}"
+            }
+
+            steps {
+                sh '''
+                    npx playwright test --reporter=html
+                '''
+            }
+
+            post {
+                always {
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', 
+                    keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', 
+                    reportName: 'Playwright Staging Report', reportTitles: '', useWrapperFileDirectly: true])
+                }
+            }
+        }
+
+        /*stage('Approval') {
             steps {
                 sh '''
                     echo "Awaiting approval"
@@ -108,7 +141,7 @@ pipeline {
                     input message: 'Do you wish to deploy to production?', ok: 'Yes, I am sure!'
                 }
             }
-        }
+        }*/
 
         stage('Deploy Production') {
             agent {
