@@ -53,7 +53,7 @@ pipeline {
                     }
                 }
 
-                stage('E2E') {
+                stage('Local E2E Test') {
                     agent {
                         docker {
                             image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
@@ -74,7 +74,7 @@ pipeline {
                         always {
                             publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', 
                             keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', 
-                            reportName: 'HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+                            reportName: 'Playwright Local Report', reportTitles: '', useWrapperFileDirectly: true])
                         }
                     }
                 }
@@ -96,6 +96,33 @@ pipeline {
                     node_modules/.bin/netlify status
                     node_modules/.bin/netlify deploy --dir=build --prod
                 '''
+            }
+        }
+
+        stage('Production E2E Test') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    reuseNode true
+                }
+            }
+
+            environment {
+                CI_ENVIRONMENT_URL = 'https://nimble-bunny-455944.netlify.app'
+            }
+
+            steps {
+                sh '''
+                    npx playwright test --reporter=html
+                '''
+            }
+
+            post {
+                always {
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', 
+                    keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', 
+                    reportName: 'Playwright Local Report', reportTitles: '', useWrapperFileDirectly: true])
+                }
             }
         }
     }
