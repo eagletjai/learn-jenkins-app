@@ -104,7 +104,7 @@ pipeline {
                 sh '''
                     echo "Awaiting approval"
                 '''
-                timeout(time: 0, unit: 'MINUTES') {
+                timeout(time: 1, unit: 'MINUTES') {
                     input message: 'Confirmation for deploying to production', ok: 'Click to push to production'
                 }
             }
