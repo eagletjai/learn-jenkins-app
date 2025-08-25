@@ -12,7 +12,9 @@ pipeline {
     stages {
 
         stage('Playwright custom image') {
-            sh 'docker build -t my-playwright .'
+            step {
+                sh 'docker build -t my-playwright .'
+            }
         }
 
         stage('Build') {
