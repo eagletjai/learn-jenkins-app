@@ -24,7 +24,7 @@ pipeline {
             }
 
             steps {
-                withCredentials([usernamePassword(credentialsId: 'aws-s3', passwordVariable: 'AWS_ACCESS_KEY_ID', usernameVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                withCredentials([usernamePassword(credentialsId: 'aws-s3', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
                     sh '''
                         aws --version
                         echo "Hello S3" > index.html
