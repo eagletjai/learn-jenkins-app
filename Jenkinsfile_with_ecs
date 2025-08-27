@@ -69,7 +69,7 @@ pipeline {
                         yum install jq -y 
                         LATEST_TD_REVISION=$(aws ecs register-task-definition --cli-input-json file://aws/ecs-taskdef.json | jq '.taskDefinition.revision')
                         aws ecs update-service --cluster $AWS_ECS_CLUSTER_NAME --service $AWS_ECS_SERVICE_NAME --task-definition $AWS_ECS_TASK_DEF_NAME:$LATEST_TD_REVISION
-                        aws ecs wait services-stable --cluster $AWS_ECS_CLUSTER_NAME --services $AWS_ECS_SERVICE_NAME
+                        #aws ecs wait services-stable --cluster $AWS_ECS_CLUSTER_NAME --services $AWS_ECS_SERVICE_NAME
                     '''
                 }
             }
