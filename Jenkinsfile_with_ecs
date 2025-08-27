@@ -5,6 +5,7 @@ pipeline {
         AWS_ECS_CLUSTER_NAME = 'jash-learnjenkins-cluster'
         AWS_ECS_SERVICE_NAME = 'jash-learnjenkins-taskdef-prod-service'
         AWS_ECS_TASK_DEF_NAME = 'jash-learnjenkins-taskdef-prod'
+        AWS_DEFAULT_REGION = 'ap-southeast-2'
     }
 
     stages {
@@ -21,6 +22,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'aws-s3', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
                     sh '''
+                        aws --version
                         aws ecs register-task-definition --cli-input-json file://aws/ecs-taskdef.json
                         aws ecs update-service --cluster $AWS_ECS_CLUSTER_NAME --service $AWS_ECS_SERVICE_NAME --task-definition $AWS_ECS_TASK_DEF_NAME:2
                     '''
@@ -28,7 +30,7 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        /*stage('Build') {
             agent {
                 docker {
                     image 'node:18-alpine'
@@ -45,7 +47,7 @@ pipeline {
                     ls -la
                 '''
             }
-        }
+        }*/
 
     }
 }
