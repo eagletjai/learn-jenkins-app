@@ -5,7 +5,8 @@ pipeline {
 
         stage('Playwright custom image') {
             steps {
-                sh 'docker build -f playwright/Dockerfile -t my-playwright .'
+                sh 'docker build -f ci/Dockerfile -t my-playwright .'
+                sh 'docker build -f ci/Dockerfile-aws -t my-aws-cli'
             }
         }
     }
