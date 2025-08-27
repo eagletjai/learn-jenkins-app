@@ -5,7 +5,7 @@ pipeline {
 
         stage('Playwright custom image') {
             steps {
-                sh 'docker build -t my-playwright .'
+                sh 'docker build -f playwright/Dockerfile -t my-playwright .'
             }
         }
     }
